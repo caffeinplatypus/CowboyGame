@@ -99,6 +99,8 @@ button[disabled]{opacity:.4}
 <canvas id="n" width="128" height="80"></canvas><div id="sl"></div><div id="rb"></div><div id="vg"></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+/* ONLINE OUTSIDE CLAUDE.AI (GitHub Pages etc): paste your Firebase Realtime Database URL between the quotes, e.g. 'https://my-game-default-rtdb.firebaseio.com'. Players can also paste it in Settings. */
+const RTDB_URL='https://dust-and-bullets-default-rtdb.firebaseio.com';
 const T=THREE;
 const SK=[{n:'Drifter',c:'#8a6a48',h:'#4a3420',cost:0},{n:'Sheriff',c:'#3a4a68',h:'#cfc8b4',cost:50},{n:'Outlaw',c:'#2a2826',h:'#141210',cost:100},{n:'Phantom',c:'#b8c4c0',h:'#7a8a86',cost:200},{n:'Gambler',c:'#7a2a2c',h:'#141210',cost:250},{n:'Rancher',c:'#d8cdb4',h:'#6a4a2a',cost:300},{n:'Bounty Hunter',c:'#3a5a44',h:'#32261a',cost:400},{n:'Marshal',c:'#a8842a',h:'#1c1814',cost:500},{n:'Trailblazer',c:'#6b8a72',h:'#e1d3aa',cost:0,d:'Free outfit · same ability as Drifter'}];
 const WP=[{n:'Colt Revolver',d:'Reliable sidearm',cost:0,dmg:1,rate:1,multi:1,pierce:0,sprd:.18,sp:20,l:1.2},
@@ -443,7 +445,7 @@ if(d<.7){m.o=1;g.grp.remove(m.m);g.gold++}}
 g.gm=g.gm.filter(m=>!m.o);
 if(p.dr&&p.hp<g.lhp-.01)p.hp+=(g.lhp-p.hp)*Math.min(.6,p.dr);if(p.hp<g.lhp-.01){g.pf=.16;tint(g.pm,true)}g.lhp=p.hp;if(g.pf>0){g.pf-=dt;if(g.pf<=0)tint(g.pm,false)}
 if(p.hp<=0&&p.rev>0){p.rev--;p.hp=p.max*.5;p.inv=2;g.lhp=p.hp;ring(p.x,p.z,9);pf(p.x,1.3,p.z,24,0xffd060,8,.7,.14,3);ban('SECOND WIND')}else if(p.hp<=0){g.dead=1.2;tint(g.pm,true);pf(p.x,1.2,p.z,16,0xa83222,6,.7,.16,4);return}
-
+ 
 document.getElementById('hp').style.width=Math.max(0,p.hp/p.max*100)+'%';document.getElementById('xp').style.width=(g.tot?(1-(g.left+g.e.length)/g.tot)*100:0)+'%';bb.textContent=p.bt>0?Math.ceil(p.bt)+'s':AB[S.skin].lb;bb.classList.toggle('cd',p.bt>0);bsb.style.display=g.boss?'block':'none';if(g.boss)bsb.firstChild.style.width=Math.max(0,g.boss.hp/g.boss.max*100)+'%';document.getElementById('bf').innerHTML=BF.filter(q=>bs(q[0])).map(q=>q[1]+' x'+bs(q[0])+' '+Math.ceil(g.bu[q[0]].t)+'s').join('<br>');
 document.getElementById('ht').textContent=`Level ${g.stage+1} · Wave ${Math.min(g.sw,10)}/10 · ${g.gold} coins · ${g.kills} down`}
 const nc=document.getElementById('n'),nx=nc.getContext('2d'),nd=nx.createImageData(128,80);let fr=0;
@@ -455,7 +457,7 @@ const qt=document.getElementById('bqt');if(qt&&inSal&&!g){const n=Math.min(bq.le
 if(g){const p=g.p;sun.position.set(p.x+20,40,p.z+10);sun.target.position.set(p.x,0,p.z);cam.position.set(p.x,10,p.z+10);cam.lookAt(p.x,0,p.z)}
 else{if(inSal)salStep();else if(mode==='town')townStep(dt);else{cam.position.set(TP.x,8,TP.z+13);cam.lookAt(TP.x,1.2,TP.z)}}
 if(pathG)pathG.visible=false;if(nearG)nearG.visible=!!g;
-{const tw=mode==='town'&&!g;if(!g){el('jl').style.display=tw?'block':'none';}el('mb').style.display=tw?'block':'none';el('th').style.display=tw&&T0-townT0<14?'block':'none';{const ns=el('ns');ns.style.display=tw?'block':'none';const so=NET.state,act=so==='prompt'||so==='denied'||so==='error'||so==='unavailable';ns.textContent=so==='online'?'● ONLINE · '+NET.peers.length+' other rider'+(NET.peers.length==1?'':'s')+' here':so==='connecting'?'… connecting to the town':'○ OFFLINE · '+({prompt:'allow live town (tap)',denied:'permission blocked (tap to fix)',unavailable:'not available in this view (tap to retry)',noviewer:'open the page from claude.ai',error:'connection problem (tap to retry)'}[so]||so);
+{const tw=mode==='town'&&!g;if(!g){el('jl').style.display=tw?'block':'none';}el('mb').style.display=tw?'block':'none';el('th').style.display=tw&&T0-townT0<14?'block':'none';{const ns=el('ns');ns.style.display=tw?'block':'none';const so=NET.state,act=so==='prompt'||so==='denied'||so==='error'||so==='unavailable'||so==='nodb';ns.textContent=so==='online'?'● ONLINE · '+NET.peers.length+' other rider'+(NET.peers.length==1?'':'s')+' here':so==='connecting'?'… connecting to the town':'○ OFFLINE · '+({prompt:'allow live town (tap)',denied:'permission blocked (tap to fix)',unavailable:'not available in this view (tap to retry)',noviewer:'open the page from claude.ai',nodb:'no server set (tap to add one)',error:'connection problem (tap to retry)'}[so]||so);
 ns.style.pointerEvents=act?'auto':'none';ns.style.cursor=act?'pointer':'default';ns.onclick=act?netAction:null}
 const ip=el('ip');if(tw&&nearD){ip.style.display='block';ip.textContent=(matchMedia('(pointer:coarse)').matches?'TAP':'E')+' · '+nearD.label.toUpperCase()}else ip.style.display='none';
 if(T0-NET.t>.1){NET.t=T0;netPresence()}}
@@ -520,7 +522,7 @@ else if(sk==4){const r=Math.random();if(r<.25){p.hp=Math.min(p.max,p.hp+50+25*(p
 else if(sk==5){const nx=Math.cos(base+Math.PI/2),nz=Math.sin(base+Math.PI/2);for(let i=-2-(p.hN||0);i<=2+(p.hN||0);i++){const x=p.x+nx*i*2,z=p.z+nz*i*2,q=new T.Mesh(sph(.6,8,6),mat('#5a3a22'));q.scale.set(1,.8,1.4);q.rotation.y=-base+Math.PI/2;q.position.set(x,.7,z);g.grp.add(q);g.b.push({m:q,x,z,y:.7,vx:Math.cos(base)*13,vz:Math.sin(base)*13,pr:99,l:1.6,h:new Set(),dm:dmg*6,rad:1.3})}}
 else if(sk==6){const ts=[...g.e].sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z)).slice(0,3+(p.tN||0));for(let i=0;i<3+(p.tN||0);i++){const t=ts[i];bomb(t?t.x:p.x+Math.cos(base)*(6+i*3),t?t.z:p.z+Math.sin(base)*(6+i*3),dmg*9)}}
 else{g.shield=5+2*(p.sT||0);ring(p.x,p.z,3);if(!g.aura){g.aura=new T.Mesh(sph(1.5,16,12),new T.MeshBasicMaterial({color:0xffd060,transparent:true,opacity:.22}));g.aura.position.y=1.6;g.pm.add(g.aura)}}}
-
+ 
 /* ===== Gambling corner ===== */
 let tableGame=null;
 const SUITS=['♠','♥','♦','♣'],RANKS=[['9',9],['10',10],['J',11],['Q',12],['K',13],['A',14]];
@@ -549,7 +551,7 @@ if(d>21||p>d)endGame(d>21?'Dealer busts.':`You win, ${p} to ${d}.`,t.w*2);else i
 function bjDouble(){const t=tableGame;if(t.done||S.gold<t.w)return;S.gold-=t.w;t.w*=2;t.p.push(t.deck.pop());if(bjV(t.p)>21){endGame(`Bust with ${bjV(t.p)}.`,0);bjR()}else bjStand()}
 /* --- poker (five-card draw vs the house) --- */
 function pokerScore(h){const v=h.map(c=>c.n).sort((a,b)=>b-a),cnt={};h.forEach(c=>cnt[c.n]=(cnt[c.n]||0)+1);const groups=Object.entries(cnt).map(([n,count])=>({n:+n,count})).sort((a,b)=>b.count-a.count||b.n-a.n),flush=h.every(c=>c.s===h[0].s),unique=[...new Set(v)],straight=unique.length===5&&((unique[0]-unique[4]===4)||(unique.join(',')==='14,5,4,3,2'));const straightHigh=unique.join(',')==='14,5,4,3,2'?5:unique[0];let rank=0,tie=[];if(straight&&flush){rank=8;tie=[straightHigh]}else if(groups[0].count===4){rank=7;tie=[groups[0].n,groups[1].n]}else if(groups[0].count===3&&groups[1].count===2){rank=6;tie=[groups[0].n,groups[1].n]}else if(flush){rank=5;tie=v}else if(straight){rank=4;tie=[straightHigh]}else if(groups[0].count===3){rank=3;tie=[groups[0].n,...groups.slice(1).map(g=>g.n).sort((a,b)=>b-a)]}else if(groups[0].count===2&&groups[1].count===2){rank=2;tie=[Math.max(groups[0].n,groups[1].n),Math.min(groups[0].n,groups[1].n),groups[2].n]}else if(groups[0].count===2){rank=1;tie=[groups[0].n,...groups.slice(1).map(g=>g.n).sort((a,b)=>b-a)]}else tie=v;return {rank,tie,label:['High card','One pair','Two pair','Three of a kind','Straight','Flush','Full house','Four of a kind','Straight flush'][rank]}}
-
+ 
 function pkStart(){const t=tableGame;t.deck=deck52();t.hand=Array.from({length:5},()=>t.deck.pop());t.held=[];pkR()}
 function pkR(){const t=tableGame;table('FIVE-CARD DRAW',`<h3>YOUR HAND${t.done?' · '+t.ps.label:''}</h3>${hand(t.hand,{held:t.held,click:t.done?null:'pkHold'})}${t.done?`<h3>HOUSE · ${t.hs.label}</h3>${hand(t.house)}<p class="res ${t.win}">${t.msg}</p>`:`<p class=sm>Tap cards to hold them, then draw.</p><button class=go onclick="pkDraw()">DRAW</button>`}`,t.done)}
 function pkHold(i){const t=tableGame;if(t.done)return;t.held=t.held.includes(i)?t.held.filter(n=>n!==i):[...t.held,i];pkR()}
@@ -593,7 +595,7 @@ else{const led=t.tr.length?eS(t.tr[0].c,t.trump):null,L=eLeg(t.h[0],led,t.trump)
 b=`<p>Trump <b>${t.trump}</b> · Tricks: you and partner <b>${t.tk[0]}</b>, outlaws <b>${t.tk[1]}</b></p><div class=tbl>${t.tr.map(x=>`<div><small>${nm[x.p]}</small>${cardF(x.c)}</div>`).join('')||'<small>Waiting for the lead…</small>'}</div>`+
 (t.st==='show'?`<p>${nm[t.win_p]} ${t.win_p?'takes':'take'} the trick.</p><button class=go onclick="euNext()">CONTINUE</button>`:t.st==='done'?`<p class="res ${t.win}">${t.msg}</p>`:`<h3>YOUR HAND${led!==null?' · follow '+led:''}</h3>${hand(t.h[0],{click:'euPlay',dim:c=>!L.includes(c)})}`)}
 table('EUCHRE',b,t.st==='done')}
-
+ 
 let salG,docW,docM,mouth,mkr,glass,liq,stream,inSal=false,talkStart=-99;const vv=new T.Vector3();
 function mkSal(){salG=new T.Group();const G=salG,w=mat('#5a3a22'),w2=mat('#4a2e1a'),dk=mat('#2a180d'),brs=mat('#b8962a');
 const bx=(W,H,D,m,x,y,z)=>{const q=new T.Mesh(gb(W,H,D),m);q.position.set(x,y,z);q.castShadow=q.receiveShadow=true;G.add(q);return q};
@@ -669,7 +671,7 @@ remotes(dt)}
 function townAct(){if(mode!=='town'||!nearD)return;const d=nearD;nearD=null;d.act()}
 function town(){if(g)return;mode='town';inSal=false;ui.className='';ui.style.display='none';hud.style.display='none';cc(0);if(dm)dm.visible=true;if(!townT0)townT0=T0;if(!S.name){nameScreen();return}netPresence()}
 /* ================= ONLINE: other riders, leaderboard ================= */
-const NET={room:null,db:null,uid:null,peers:[],t:0,last:'',ra:{},state:'connecting',err:'',perm:null,off:null,booted:false};
+const NET={room:null,db:null,uid:null,peers:[],t:0,last:'',ra:{},state:'connecting',err:'',perm:null,off:null,booted:false,mode:'claude',lastT:0};
 /* states: connecting, online, prompt (needs your OK), denied (blocked), unavailable (this view cannot run live rooms), noviewer (not inside the claude.ai viewer), error */
 async function netInit(){try{if(!window.claude||!window.claude.use){NET.state='noviewer';return}
 if(!NET.booted){NET.booted=true;claude.use('user').then(async u=>{if(u){try{NET.uid=await u.id();lbWrite()}catch(e){}}}).catch(()=>{});claude.use('db').then(d=>{NET.db=d;lbWrite()}).catch(()=>{})}
@@ -678,17 +680,35 @@ if(st==='denied'){NET.state='denied';return}
 if(st==='prompt'){NET.state='prompt';try{st=(await NET.perm.request(['room']))['room']||'denied'}catch(e){st='denied'}if(st==='denied'){NET.state='denied';return}}
 const r=await claude.use('room');if(!r){NET.state='unavailable';return}NET.room=r;NET.state='online';if(NET.off)NET.off();
 NET.off=r.onPeers(c=>{NET.peers=c.peers.filter(p=>p.kind==='viewer'&&!p.sameTab)},e=>{NET.err=e&&e.code||'';NET.state=NET.err==='not_granted'||NET.err==='capability_disabled'?'denied':'error'})}catch(e){NET.state='error';NET.err=String(e&&e.message||e).slice(0,40)}}
-async function netAction(){const s=NET.state;if(s==='denied'&&NET.perm){try{await NET.perm.manage()}catch(e){}}NET.state='connecting';NET.room=null;NET.last='';netInit()}
+function netBoot(){if(window.claude&&window.claude.use){NET.mode='claude';netInit()}else rtStart()}
+async function netAction(){const s=NET.state;if(s==='nodb'){settings();return}if(NET.mode==='rest'){NET.state='connecting';rtStart();return}if(s==='denied'&&NET.perm){try{await NET.perm.manage()}catch(e){}}NET.state='connecting';NET.room=null;NET.last='';netInit()}
+/* REST backend: Firebase Realtime Database over plain fetch + EventSource (no SDK). Presence lives at /town/<id>, wins at /leaderboard/<id>. */
+const RT={tree:{},es:null};
+const rtU=p=>(S.dburl||RTDB_URL).replace(/\/+$/,'')+'/'+p+'.json';
+function rtApply(path,data,merge){const parts=String(path||'/').split('/').filter(Boolean);if(!parts.length){RT.tree=merge?Object.assign({},RT.tree,data||{}):(data&&typeof data=='object'?data:{});return}
+let o=RT.tree;for(let i=0;i<parts.length-1;i++)o=o[parts[i]]=(o[parts[i]]&&typeof o[parts[i]]=='object')?o[parts[i]]:{};const k=parts[parts.length-1];if(data===null)delete o[k];else if(merge&&data&&typeof data=='object')o[k]=Object.assign({},o[k]||{},data);else o[k]=data}
+function rtPeers(){const now=Date.now(),out=[];for(const k in RT.tree){const v=RT.tree[k];if(k===NET.uid||!v||typeof v!=='object'||now-(+v.t||0)>8000)continue;out.push({peer:k,by:k,isMe:false,sameTab:false,kind:'viewer',presence:v})}return out}
+function rtStart(){if(RT.es){RT.es.close();RT.es=null}NET.mode='rest';NET.peers=[];if(!(S.dburl||RTDB_URL)){NET.state='nodb';return}
+S.id=S.id||('u'+Math.random().toString(36).slice(2,10)+Date.now().toString(36));save();NET.uid=S.id;NET.state='connecting';RT.tree={};NET.room=null;
+try{const es=new EventSource(rtU('town'));RT.es=es;const on=(t,m)=>es.addEventListener(t,e=>{try{const d=JSON.parse(e.data);rtApply(d.path,d.data,m);NET.state='online'}catch(_){}});on('put',false);on('patch',true);
+es.addEventListener('cancel',()=>{NET.state='error';NET.err='rules'});es.addEventListener('auth_revoked',()=>{NET.state='error';NET.err='auth'});es.onerror=()=>{if(NET.state!=='online'){NET.state='error';NET.err='unreachable'}}}catch(e){NET.state='error';NET.err='unreachable'}}
+addEventListener('pagehide',()=>{if(NET.mode==='rest'&&NET.uid&&(S.dburl||RTDB_URL))fetch(rtU('town/'+NET.uid),{method:'DELETE',keepalive:true}).catch(()=>{})});
+function setDb(v){v=String(v||'').trim();const m=el('dbmsg');if(v&&!/^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.(firebaseio\.com|firebasedatabase\.app)\/?$/i.test(v)){if(m)m.textContent='That does not look like a Firebase Realtime Database URL.';return}S.dburl=v.replace(/\/+$/,'');save();if(m)m.textContent=v?'Saved. Connecting…':'Cleared.';NET.last='';rtStart()}
 const NETMSG={online:'',connecting:'Connecting to the town…',prompt:'The page is waiting for you to allow live connections. Tap the status line at the top left to be asked again.',denied:'Live connections are blocked for this page. Tap the status line at the top left to open the Permissions panel and switch it on.',
-unavailable:'This view cannot run the live town. It needs the claude.ai viewer with a signed-in account that can open the page (a member, or a guest invited to it). Public links and signed-out visitors cannot connect.',noviewer:'This copy of the page is not running inside the claude.ai viewer (it looks like a saved file, another site, or the chat preview), so there is no live town. Open the published page link from claude.ai.',error:'The connection failed. Tap the status line at the top left to retry.'};
-netInit();
-function netPresence(){if(!NET.room)return;const o={n:S.name||'',x:+TP.x.toFixed(1),z:+TP.z.toFixed(1),h:+TP.h.toFixed(2),k:S.skin,wn:S.wins||0,r:g?1:0},k=JSON.stringify(o);if(k!==NET.last){NET.last=k;NET.room.presence(o).catch(e=>{if(e&&e.code==='not_granted')NET.state='denied'})}}
+nodb:'There is no online server set up for this copy of the page. Open Settings, paste a Firebase Realtime Database URL under ONLINE SERVER, and set the rules shown there. Tap the status line at the top left to go to Settings.',unavailable:'This view cannot run the live town. It needs the claude.ai viewer with a signed-in account that can open the page (a member, or a guest invited to it). Public links and signed-out visitors cannot connect.',noviewer:'This copy of the page is not running inside the claude.ai viewer (it looks like a saved file, another site, or the chat preview), so there is no live town. Open the published page link from claude.ai.',error:'The connection failed. Tap the status line at the top left to retry. If this is a Firebase server, check the URL and that the rules from Settings are published.'};
+netBoot();
+const pres=()=>({n:S.name||'',x:+TP.x.toFixed(1),z:+TP.z.toFixed(1),h:+TP.h.toFixed(2),k:S.skin,wn:S.wins||0,r:g?1:0});
+function netPresence(){const now=Date.now();
+if(NET.mode==='rest'){NET.peers=rtPeers();if(NET.state==='nodb'||!NET.uid)return;const o=pres(),k=JSON.stringify(o);
+if((k!==NET.last&&now-NET.lastT>240)||now-NET.lastT>3000){NET.last=k;NET.lastT=now;o.t=now;fetch(rtU('town/'+NET.uid),{method:'PUT',body:JSON.stringify(o),keepalive:true}).catch(()=>{})}
+if(now-(NET.clean||0)>20000){NET.clean=now;let n=0;for(const id in RT.tree){const v=RT.tree[id];if(id!==NET.uid&&v&&now-(+v.t||0)>90000&&n++<3)fetch(rtU('town/'+id),{method:'DELETE'}).catch(()=>{})}}return}
+if(!NET.room)return;const o=pres(),k=JSON.stringify(o);if(k!==NET.last){NET.last=k;NET.room.presence(o).catch(e=>{if(e&&e.code==='not_granted')NET.state='denied'})}}
 function remotes(dt){const seen={};for(const p of NET.peers){const d=p.presence||{};if(typeof d.x!=='number'||typeof d.z!=='number'||d.r)continue;seen[p.peer]=1;const kk=(d.k|0)>=0&&(d.k|0)<SK.length?d.k|0:0;let a=NET.ra[p.peer];
 if(!a||a.k!==kk){if(a)townG.remove(a.m);const sk=SK[kk],m=cowboy(sk.c,sk.h,1,{coat:1,scarf:'#9a3a22',gun:1});const tg=nameTag(nameOK(d.n)||'Rider');tg.position.set(0,2.55,0);m.add(tg);m.position.set(d.x,0,d.z);townG.add(m);a=NET.ra[p.peer]={m,k:kk,n:d.n}}
 const m=a.m,ox=m.position.x,oz=m.position.z,f=Math.min(1,dt*8);m.position.x+=(d.x-ox)*f;m.position.z+=(d.z-oz)*f;const th=+d.h||0;m.rotation.y+=Math.atan2(Math.sin(th-m.rotation.y),Math.cos(th-m.rotation.y))*Math.min(1,dt*10);
 anim(m,dt,Math.hypot(m.position.x-ox,m.position.z-oz)/dt>.8?1:0,12)}
 for(const k in NET.ra)if(!seen[k]){townG.remove(NET.ra[k].m);delete NET.ra[k]}}
-function lbWrite(){if(NET.db&&NET.uid&&S.name&&S.wins>0)NET.db.doc('leaderboard/'+NET.uid).set({name:S.name,wins:S.wins||0,t:Date.now()}).catch(()=>{})}
+function lbWrite(){if(NET.mode==='rest'&&NET.uid&&S.name&&S.wins>0&&(S.dburl||RTDB_URL)){fetch(rtU('leaderboard/'+NET.uid),{method:'PUT',body:JSON.stringify({name:S.name,wins:S.wins,t:Date.now()})}).catch(()=>{});return}if(NET.db&&NET.uid&&S.name&&S.wins>0)NET.db.doc('leaderboard/'+NET.uid).set({name:S.name,wins:S.wins||0,t:Date.now()}).catch(()=>{})}
 /* ================= MENU PANELS (wood style) ================= */
 function wpanel(t,b,back){mode='menu';ui.style.display='flex';ui.className='side';ui.innerHTML=`<div class=wp><div class=wtitle><h1>${t}</h1></div>${b}<button class=wbtn onclick="${back||'openMenu()'}"><b>← BACK</b></button></div>`}
 function openMenu(){if(g)return;mode='menu';ui.style.display='flex';ui.className='side';const on=NET.peers.length;
@@ -703,17 +723,36 @@ ui.innerHTML=`<div class=wp><div class=wtitle><h1>DUST &amp; BULLETS</h1><small>
 function travel(){wpanel('STAGECOACH',`<div class=wbar><b>CHOOSE YOUR LEVEL</b><div class=row>${MP.map((s,i)=>card(s,i,'maps','map')).join('')}</div><p class=sm>Beat a level’s boss to unlock the next. Defeat Ol’ Scratch to win.</p></div><button class="wbtn hi" onclick="start()"><b>RIDE OUT</b><span>${MP[S.map].n}</span></button>`,'town()')}
 function applyStatic(){const k=Math.min(1,.2+S.st/100*1.1);el('sl').style.opacity=k;el('rb').style.opacity=k}
 function settings(){wpanel('SETTINGS',`<div class=wbar><b>SCREEN STATIC</b><div class=sld><small>WEAK</small><input type=range min=0 max=100 value=${S.st} oninput="S.st=+this.value;applyStatic();save()"><small>STRONG</small></div></div>
-<div class=wbar><b>USERNAME</b><div class=sld><input type=text id=nm maxlength=14 value="${nameOK(S.name)}"><button class=wbtn onclick="setName(el('nm').value)"><b>SAVE</b></button></div><p id=nmsg class=sm>2 to 14 letters, numbers, spaces, - _ .  Other riders see this above your head and on the leaderboard.</p></div>`)}
+<div class=wbar><b>USERNAME</b><div class=sld><input type=text id=nm maxlength=14 value="${nameOK(S.name)}"><button class=wbtn onclick="setName(el('nm').value)"><b>SAVE</b></button></div><p id=nmsg class=sm>2 to 14 letters, numbers, spaces, - _ .  Other riders see this above your head and on the leaderboard.</p></div>
+${window.claude&&window.claude.use?'':`<div class=wbar><b>ONLINE SERVER</b><div class=sld><input type=text id=dbu placeholder="https://your-project-default-rtdb.firebaseio.com" value="${(S.dburl||RTDB_URL||'').replace(/[^a-zA-Z0-9:/.\-]/g,'')}"><button class=wbtn onclick="setDb(el('dbu').value)"><b>SAVE</b></button></div><p id=dbmsg class=sm>Needed to see other riders and share the leaderboard outside claude.ai. Create a free Firebase project, add a Realtime Database, paste its URL here, then paste these rules into the database's Rules tab and Publish.</p>
+<textarea readonly rows=8 style="width:100%;box-sizing:border-box;font-size:11px">{
+  "rules": {
+    "town": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.hasChildren(['n','x','z','t']) && newData.child('n').isString() && newData.child('n').val().length <= 14"
+      }
+    },
+    "leaderboard": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.hasChildren(['name','wins']) && newData.child('name').isString() && newData.child('name').val().length <= 14 && newData.child('wins').isNumber()"
+      }
+    }
+  }
+}</textarea></div>`}`)}
 function setName(v){const n=nameOK(v),m=el('nmsg');if(!n){if(m)m.textContent='Use 2 to 14 letters or numbers.';return}S.name=n;save();setDm();lbWrite();netPresence();if(m)m.textContent='Saved. You are '+n+'.'}
 function nameScreen(){mode='menu';ui.style.display='flex';ui.className='side';ui.innerHTML=`<div class=wp><div class=wtitle><h1>WELCOME, RIDER</h1><small>PICK A NAME FOR THE TOWN</small></div><div class=wbar><b>USERNAME</b><div class=sld><input type=text id=nm maxlength=14 value="Rider${100+Math.random()*900|0}"></div><p id=nmsg class=sm>Other riders see this above your head, and it goes on the leaderboard.</p></div><button class="wbtn hi" onclick="const n=nameOK(el('nm').value);if(n){S.name=n;save();setDm();lbWrite();town()}else el('nmsg').textContent='Use 2 to 14 letters or numbers.'"><b>ENTER TOWN</b></button></div>`}
 function riders(){const rows=NET.peers.filter(p=>p.presence&&p.presence.n).map(p=>`<div class=lbr><b>${nameOK(p.presence.n)||'Rider'}${p.isMe?' (you, another tab)':''}</b><small>${p.presence.r?'out on a run':'in town'}</small><em>${p.presence.wn|0}</em></div>`).join('');
 wpanel('RIDERS ONLINE',`<div class=wbar><div class=lbr><b>${nameOK(S.name)||'You'} (you)</b><small>${g?'out on a run':'in town'}</small><em>${S.wins|0}</em></div>${rows||`<p class=sm>${NET.state==='online'?'Nobody else is here right now. Only signed-in people who can open this page (members, or guests invited to it) meet in town; visitors on a public link or signed out cannot connect.':NETMSG[NET.state]||''}</p>`}<p class=sm>The number is how many times each rider has beaten the game.</p></div>`)}
 async function leaderboard(){wpanel('LEADERBOARD',`<div class=wbar id=lbl><small>Loading…</small></div>`);let rows=[];
-try{if(NET.db){const q=await NET.db.collection('leaderboard').orderBy('wins','desc').limit(20).get();rows=q.docs.map(d=>({id:d.id,n:nameOK(d.data().name)||'Rider',w:+d.data().wins||0}))}}catch(e){}
+try{if(NET.mode==='rest'&&(S.dburl||RTDB_URL)){const r=await fetch(rtU('leaderboard'),{cache:'no-store'});if(r.ok){const d=await r.json()||{};rows=Object.entries(d).filter(([k,v])=>v&&typeof v=='object').map(([k,v])=>({id:k,n:nameOK(v.name)||'Rider',w:Math.min(99999,Math.max(0,+v.wins||0))}))}}else if(NET.db){const q=await NET.db.collection('leaderboard').orderBy('wins','desc').limit(20).get();rows=q.docs.map(d=>({id:d.id,n:nameOK(d.data().name)||'Rider',w:+d.data().wins||0}))}}catch(e){}
 const me=NET.uid||'me';if(!rows.some(r=>r.id===me)&&S.wins>0)rows.push({id:me,n:nameOK(S.name)||'You',w:S.wins});
 for(const p of NET.peers){const d=p.presence||{},id=p.by||p.peer;if(d.wn>0&&!rows.some(r=>r.id===id))rows.push({id,n:nameOK(d.n)||'Rider',w:d.wn|0})}
 rows=rows.filter(r=>r.w>0).sort((a,b)=>b.w-a.w);const h=rows.length?rows.slice(0,20).map((r,i)=>`<div class="lbr ${r.id===me?'me':''}"><span>${i+1}</span><b>${r.n}</b><em>${r.w}</em></div>`).join(''):'<p>Nobody has beaten Ol’ Scratch yet. Be the first!</p>';
-const e=el('lbl');if(e&&mode==='menu')e.innerHTML=`<b>TIMES BEATEN THE GAME</b>${h}${NET.db?'':'<p class=sm>The shared leaderboard is not available in this view. Showing riders in town and your own record.</p>'}`}
+const e=el('lbl');if(e&&mode==='menu')e.innerHTML=`<b>TIMES BEATEN THE GAME</b>${h}${NET.db||NET.mode==='rest'&&NET.state==='online'?'':'<p class=sm>The shared leaderboard is not available in this view. Showing riders in town and your own record.</p>'}`}
 function showResult(extra){wpanel('RESULT',`<div class=wbar>${extra}</div>`,'town()');const b=ui.querySelector('.wp>button:last-child b');if(b)b.textContent='CONTINUE'}
 applyStatic();mkSal();mkTown();build();menu();requestAnimationFrame(loop);
 </script></body></html>
